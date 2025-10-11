@@ -1,0 +1,1 @@
+["age", "gender", "subscription_type", "watch_hours", "last_login_days", "region", "device", "churned", "payment_method", "number_of_profiles", "avg_watch_time_per_day", "favorite_genre", "watch_hours_per_profile", "cluster", "hier_cluster", "dbscan_cluster"]
