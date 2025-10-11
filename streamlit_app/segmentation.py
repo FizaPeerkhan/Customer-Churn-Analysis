@@ -20,7 +20,7 @@ with open(os.path.join(MODEL_DIR, "kmeans_features.json"), "r") as f:
 # --- Preprocessing function ---
 def preprocess_input(df: pd.DataFrame) -> np.ndarray:
     """Preprocess input dataframe to match training features and apply PCA."""
-    
+
     # Feature engineering
     df['watch_hours_per_profile'] = df['watch_hours'] / df['number_of_profiles'].replace(0, 1)
 
@@ -31,7 +31,9 @@ def preprocess_input(df: pd.DataFrame) -> np.ndarray:
 
     # Categorical columns
     categorical_cols = ['subscription_type', 'device', 'gender', 'favorite_genre', 'payment_method', 'region']
-    df_cat_encoded = encoder.transform(df[categorical_cols])
+
+    # Handle unknown categories by ignoring them
+    df_cat_encoded = encoder.transform(df[categorical_cols].apply(lambda x: x.where(x.isin(encoder.categories_[categorical_cols.index(x.name)]), 'Other')))
 
     # Combine numeric and categorical features
     X_combined = np.hstack([df_num_scaled, df_cat_encoded])
@@ -40,6 +42,7 @@ def preprocess_input(df: pd.DataFrame) -> np.ndarray:
     X_pca = pca.transform(X_combined)
 
     return X_pca
+
 
 # --- Cluster prediction ---
 def assign_cluster(df: pd.DataFrame) -> int:
