@@ -9,7 +9,7 @@ import numpy as np
 from segmentation import assign_cluster
 from prediction import predict_churn
 from recommendation import recommend_offer
-
+from business_problem import show_business_problem
 # --- Streamlit Page Config ---
 st.set_page_config(
     page_title="Netflix Customer Insights", 
@@ -241,7 +241,11 @@ cluster_insights = {
 }
 
 # --- Main Content with Enhanced Tabs ---
-tab1, tab2 = st.tabs(["🎯  SINGLE CUSTOMER ANALYSIS", "📊  BATCH ANALYSIS"])
+tab1, tab2, tab3 = st.tabs(["🎯 SINGLE ANALYSIS", "📊 BATCH ANALYSIS", "💼 BUSINESS PROBLEM"])
+
+# Add the business problem tab
+with tab3:
+    show_business_problem()
 
 with tab1:
     st.markdown("<h3 class='sub-header'>Individual Customer Analysis</h3>", unsafe_allow_html=True)
