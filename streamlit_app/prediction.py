@@ -4,8 +4,8 @@ import joblib
 import json
 
 # Load GBM model and features
-gb_model = joblib.load("models/gb_churn_model.joblib")
-with open("models/gb_features.json", "r") as f:
+gb_model = joblib.load("../models/gb_churn_model.joblib")
+with open("../models/gb_features.json", "r") as f:
     gb_features = json.load(f)
 
 def preprocess_churn(df: pd.DataFrame) -> pd.DataFrame:

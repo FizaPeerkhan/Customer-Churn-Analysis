@@ -10,6 +10,7 @@ from segmentation import assign_cluster
 from prediction import predict_churn
 from recommendation import recommend_offer
 from business_problem import show_business_problem
+from batch_results import show_batch_results
 # --- Streamlit Page Config ---
 st.set_page_config(
     page_title="Netflix Customer Insights", 
@@ -336,7 +337,7 @@ with tab2:
     </div>
     """, unsafe_allow_html=True)
     
-    uploaded_file = st.file_uploader("Choose CSV file", type=["csv"], label_visibility="collapsed")
+    uploaded_file = st.file_uploader("Choose CSV file", type=["csv"], label_visibility="collapsed", key="batch_uploader")
     
     if uploaded_file:
         df = pd.read_csv(uploaded_file)
@@ -348,7 +349,11 @@ with tab2:
         </div>
         """, unsafe_allow_html=True)
         
-        # Process data
+        # Show data preview
+        with st.expander("📋 Original Data Preview", expanded=True):
+            st.dataframe(df.head(), use_container_width=True)
+        
+        # Process data automatically
         cols = ["age", "gender", "subscription_type", "watch_hours", "last_login_days",
                 "region", "device", "payment_method", "number_of_profiles",
                 "avg_watch_time_per_day", "favorite_genre"]
@@ -375,6 +380,9 @@ with tab2:
             
             status_text.text("✅ Analysis complete!")
 
+        # Store processed data in session state
+        st.session_state.processed_batch_data = df
+        
         # Add revenue calculations
         if 'monthly_revenue' not in df.columns:
             df['monthly_revenue'] = 499
@@ -382,9 +390,17 @@ with tab2:
         
         # Simulate churn probability after recommendations
         df['churn_prob_after'] = df['churn_prob'] * np.random.uniform(0.6, 0.9, len(df))
+    
+    # Display results if we have processed data
+    if 'processed_batch_data' in st.session_state:
+        df = st.session_state.processed_batch_data
         
-        # Enhanced Results section
-        st.markdown("#### 📊 Analysis Overview")
+        # 🚀 SHOW BATCH RESULTS WITH TABLE
+        show_batch_results(df)
+        
+        # 🎨 ADD ALL THE GRAPHS AFTER THE TABLE
+        st.markdown("---")
+        st.markdown("#### 📊 Advanced Analytics Dashboard")
         
         # Enhanced Key Metrics
         total_users = len(df)
@@ -432,7 +448,7 @@ with tab2:
 
         # Batch Results Overview Section
         st.markdown("---")
-        st.markdown("#### 📈 BATCH RESULTS OVERVIEW")
+        st.markdown("#### 📈 Advanced Visualizations")
         
         # Row 1: Customer Segments and Churn Analysis
         col1, col2 = st.columns(2)
@@ -569,39 +585,3 @@ with tab2:
                 
                 ax6.set_title('Customer Risk Distribution', fontweight=700, pad=20, color='white')
                 st.pyplot(fig6)
-
-        # Enhanced Download section
-        st.markdown("---")
-        st.markdown("#### 📥 EXPORT RESULTS")
-        
-        st.markdown("""
-        <div class='feature-list'>
-            <p>• Customer segments and detailed profiles</p>
-            <p>• Churn probability scores for each customer</p>
-            <p>• Personalized retention recommendations</p>
-            <p>• Revenue impact and risk analysis</p>
-            <p>• Complete customer insights dataset</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        csv_data = df.to_csv(index=False).encode('utf-8')
-        
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.download_button(
-                label="📊 DOWNLOAD ANALYSIS REPORT",
-                data=csv_data,
-                file_name="netflix_customer_insights.csv",
-                mime="text/csv",
-                use_container_width=True,
-                key="download_batch"
-            )
-
-# --- Enhanced Footer ---
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: #666; padding: 20px;'>
-    <p style='margin: 0; font-weight: 500;'>Netflix Customer Insights Dashboard</p>
-    <p style='margin: 5px 0 0 0; font-size: 0.9rem; color: #888;'>Advanced Analytics Platform</p>
-</div>
-""", unsafe_allow_html=True)
